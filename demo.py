@@ -92,7 +92,12 @@ def _(pd, words):
 
 @app.cell
 def _(np, word_lengths: "pd.DataFrame"):
-    word_lengths.drop(columns="words").groupby("size").mean().plot(xticks=np.arange(2,21,2),xlabel="Word Length", ylabel="Average Frequency")
+    word_lengths.drop(columns="words").groupby("size").mean().plot(xticks=np.arange(2,21,2),xlabel="Word Length", ylabel="Average Frequency", title="Average Frequency of Words in Moby Dick by Word Length")
+    return
+
+
+@app.cell
+def _():
     return
 
 
