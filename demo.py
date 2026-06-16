@@ -45,34 +45,39 @@ def _(x, y):
 def _(re, requests):
     body = requests.get("https://www.gutenberg.org/cache/epub/2701/pg2701.txt").text.lower()
     body = re.sub("[^a-z]", " ", body)
-    body
+    body[:20]
     return (body,)
 
 
 @app.cell
 def _(body, pd):
     words = pd.DataFrame({"words": body.split()})
-    words
+    words[:20]
     return (words,)
 
 
 @app.cell
 def _(words):
     most_frequent_words = words.groupby("words").size().sort_values(ascending=False)
-    most_frequent_words
+    most_frequent_words[:20]
     return
 
 
 @app.cell
 def _(words):
     long_words = words[words["words"].str.len() > 8]
-    long_words
+    long_words[:20]
     return (long_words,)
 
 
 @app.cell
 def _(long_words):
-    long_words.groupby("words").size().sort_values(ascending=False)
+    long_words.groupby("words").size().sort_values(ascending=False)[:20]
+    return
+
+
+@app.cell
+def _():
     return
 
 
