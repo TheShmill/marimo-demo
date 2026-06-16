@@ -2,6 +2,7 @@
 # requires-python = ">=3.13"
 # dependencies = [
 #     "marimo>=0.23.3",
+#     "matplotlib>=3.11.0",
 #     "pandas>=3.0.3",
 #     "requests>=2.34.2",
 # ]
@@ -19,8 +20,9 @@ def _():
     import pandas as pd
     import numpy as np
     import re
+    import matplotlib
 
-    return pd, re, requests
+    return np, pd, re, requests
 
 
 @app.cell
@@ -77,19 +79,20 @@ def _(long_words):
 
 
 @app.cell
-def _(words):
-    (words
+def _(pd, words):
+    word_lengths: pd.DataFrame = (words
      .groupby("words")
      .size()
      .to_frame("count")
      .reset_index()
-     .assign(size=lambda w: w.words.str.len())
-     .sort_values(by="size", ascending=False))
-    return
+     .assign(size=lambda w: w.words.str.len()))
+    word_lengths.sort_values("size", ascending=False)
+    return (word_lengths,)
 
 
 @app.cell
-def _():
+def _(np, word_lengths: "pd.DataFrame"):
+    word_lengths.drop(columns="words").groupby("size").mean().plot(xticks=np.arange(2,21,2),xlabel="Word Length", ylabel="Average Frequency")
     return
 
 
