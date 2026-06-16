@@ -65,7 +65,7 @@ def _(words):
 
 @app.cell
 def _(words):
-    long_words = words[words["words"].str.len() > 8]
+    long_words = words[words.words.str.len() > 8]
     long_words[:20]
     return (long_words,)
 
@@ -73,6 +73,18 @@ def _(words):
 @app.cell
 def _(long_words):
     long_words.groupby("words").size().sort_values(ascending=False)[:20]
+    return
+
+
+@app.cell
+def _(words):
+    (words
+     .groupby("words")
+     .size()
+     .to_frame("count")
+     .reset_index()
+     .assign(size=lambda w: w.words.str.len())
+     .nlargest(10, "size"))
     return
 
 
