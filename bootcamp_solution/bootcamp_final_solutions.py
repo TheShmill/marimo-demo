@@ -45,6 +45,16 @@ def _():
     return (train_test_split,)
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    Data sets:
+    - [gradebook.csv](https://raw.githubusercontent.com/TheShmill/marimo-demo/refs/heads/main/bootcamp/gradebook.csv)
+    - [students.csv](https://raw.githubusercontent.com/TheShmill/marimo-demo/refs/heads/main/bootcamp/students.csv)
+    """)
+    return
+
+
 # ── Data Setup ────────────────────────────────────────────────────────────────
 
 @app.cell(hide_code=True)
