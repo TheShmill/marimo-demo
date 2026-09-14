@@ -4,9 +4,10 @@
 #     "marimo>=0.24.2",
 # ]
 # ///
+
 import marimo
 
-__generated_with = "0.9.0"
+__generated_with = "0.24.2"
 app = marimo.App(width="medium")
 
 
@@ -42,7 +43,17 @@ def _():
     return (train_test_split,)
 
 
-# ── Section 1: Variables & Input/Output ───────────────────────────────────────
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Datasets
+    The following datasets are used:
+    - [gradebook.csv](https://raw.githubusercontent.com/TheShmill/marimo-demo/refs/heads/main/bootcamp/gradebook.csv)
+    - [students.csv](https://raw.githubusercontent.com/TheShmill/marimo-demo/refs/heads/main/bootcamp/students.csv)
+    """)
+    return
+
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -190,8 +201,6 @@ def _():
     # Your code here
     return
 
-
-# ── Section 2: Functions ──────────────────────────────────────────────────────
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -371,8 +380,6 @@ def _(format_score, summarize_student):
     print(ex6_summary_default)
     return (ex6_summary_custom, ex6_summary_default)
 
-
-# ── Section 3: Conditionals ───────────────────────────────────────────────────
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -572,8 +579,6 @@ def _(can_graduate):
     return (ex9_result_yes, ex9_result_no_grade, ex9_result_no_credits, ex9_result_waiver)
 
 
-# ── Section 4: Loops ──────────────────────────────────────────────────────────
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -772,8 +777,6 @@ def _(letter_grade):
     return
 
 
-# ── Section 5: Lists ──────────────────────────────────────────────────────────
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -922,8 +925,6 @@ def _(class_report):
     class_report(ex16_scores)
     return (ex16_scores,)
 
-
-# ── Section 6: Dictionaries ───────────────────────────────────────────────────
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -1124,8 +1125,6 @@ def _(print_gradebook_report):
     print_gradebook_report(ex20_gradebook)
     return (ex20_gradebook,)
 
-
-# ── Section 7: Pandas & DataFrames ───────────────────────────────────────────
 
 @app.cell(hide_code=True)
 def _(pd):
@@ -1475,8 +1474,6 @@ def _(ex25_sorted):
     return
 
 
-# ── Section 8: Matplotlib ─────────────────────────────────────────────────────
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -1739,8 +1736,6 @@ def _(gradebook_df, plt):
     # Your code here
     return
 
-
-# ── Section 9: Scikit-learn ───────────────────────────────────────────────────
 
 @app.cell(hide_code=True)
 def _(mo):
