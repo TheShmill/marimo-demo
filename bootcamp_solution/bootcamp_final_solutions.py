@@ -1,3 +1,12 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "marimo>=0.24.2",
+#     "matplotlib==3.11.2",
+#     "pandas==3.0.5",
+#     "scikit-learn==1.9.1",
+# ]
+# ///
 import marimo
 
 __generated_with = "0.9.0"
@@ -34,6 +43,75 @@ def _():
 def _():
     from sklearn.model_selection import train_test_split
     return (train_test_split,)
+
+
+# ── Data Setup ────────────────────────────────────────────────────────────────
+
+@app.cell(hide_code=True)
+def _(pd):
+    import pathlib
+    import numpy as _np
+    _here = pathlib.Path(__file__).parent
+    _gradebook_path = _here / "gradebook.csv"
+    if not _gradebook_path.exists():
+        _gb = {
+            "name": [
+                "Alex", "Jordan", "Morgan", "Taylor", "Casey",
+                "Jamie", "Dana", "Riley", "Quinn", "Blake",
+                "Avery", "Cameron", "Drew", "Emery", "Finley",
+                "Harper", "Hayden", "Jesse", "Kai", "Lane",
+                "Logan", "Maddox", "Max", "Parker", "Peyton",
+                "Reese", "River", "Sage", "Skyler", "Sydney",
+            ],
+            "homework": [
+                88.0, 72.0, 95.0, 61.0, 83.0,
+                90.0, 55.0, 78.0, 65.0, 92.0,
+                80.0, 70.0, 85.0, 58.0, 96.0,
+                74.0, 68.0, 87.0, 51.0, 93.0,
+                77.0, 62.0, 89.0, 75.0, 84.0,
+                91.0, 66.0, 79.0, 98.0, 59.0,
+            ],
+            "midterm": [
+                82, 68, 91, 58, 77,
+                85, 62, 75, 60, 94,
+                78, 65, 88, 55, 98,
+                71, 72, 84, 48, 90,
+                80, 66, 87, 73, 82,
+                89, 63, 76, 97, 57,
+            ],
+            "final_exam": [
+                79, 74, 88, 63, 80,
+                92, 58, 71, 51, 96,
+                82, 68, 84, 44, 95,
+                77, 70, 86, 53, 91,
+                75, 60, 90, 78, 83,
+                93, 65, 74, 99, 55,
+            ],
+            "letter": [
+                "B", "C", "A", "D", "B",
+                "B", "F", "C", "F", "A",
+                "B", "D", "B", "F", "A",
+                "C", "C", "B", "F", "A",
+                "C", "D", "B", "C", "B",
+                "A", "D", "C", "A", "F",
+            ],
+        }
+        pd.DataFrame(_gb).to_csv(_gradebook_path, index=False)
+    _students_path = _here / "students.csv"
+    if not _students_path.exists():
+        _rng = _np.random.default_rng(42)
+        _n = 150
+        _study_hours = _rng.uniform(1.0, 15.0, _n).round(1)
+        _attendance = _rng.uniform(50.0, 100.0, _n).round(1)
+        _base = (_study_hours / 15.0) * 35 + (_attendance / 100.0) * 35 + 30
+        pd.DataFrame({
+            "study_hours": _study_hours,
+            "attendance": _attendance,
+            "homework": _np.clip(_base + _rng.normal(0, 8, _n), 40, 100).round(1),
+            "midterm": _np.clip(_base + _rng.normal(0, 10, _n), 40, 100).astype(int),
+            "final_exam": _np.clip(_base + _rng.normal(0, 10, _n), 40, 100).astype(int),
+        }).to_csv(_students_path, index=False)
+    return
 
 
 # ── Section 1: Variables & Input/Output ───────────────────────────────────────
@@ -1171,63 +1249,241 @@ def _(print_gradebook_report):
     return (ex20_gradebook,)
 
 
-# ── Section 7: Pandas & DataFrames ───────────────────────────────────────────
+# ── Section 7: NumPy Arrays ───────────────────────────────────────────────────
+
+@app.cell
+def _():
+    import numpy as np
+    return (np,)
+
 
 @app.cell(hide_code=True)
-def _(pd):
-    import pathlib
-    _csv_path = pathlib.Path(__file__).parent / "gradebook.csv"
-    _data = {
-        "name": [
-            "Alex", "Jordan", "Morgan", "Taylor", "Casey",
-            "Jamie", "Dana", "Riley", "Quinn", "Blake",
-            "Avery", "Cameron", "Drew", "Emery", "Finley",
-            "Harper", "Hayden", "Jesse", "Kai", "Lane",
-            "Logan", "Maddox", "Max", "Parker", "Peyton",
-            "Reese", "River", "Sage", "Skyler", "Sydney",
-        ],
-        "homework": [
-            88.0, 72.0, 95.0, 61.0, 83.0,
-            90.0, 55.0, 78.0, 65.0, 92.0,
-            80.0, 70.0, 85.0, 58.0, 96.0,
-            74.0, 68.0, 87.0, 51.0, 93.0,
-            77.0, 62.0, 89.0, 75.0, 84.0,
-            91.0, 66.0, 79.0, 98.0, 59.0,
-        ],
-        "midterm": [
-            82, 68, 91, 58, 77,
-            85, 62, 75, 60, 94,
-            78, 65, 88, 55, 98,
-            71, 72, 84, 48, 90,
-            80, 66, 87, 73, 82,
-            89, 63, 76, 97, 57,
-        ],
-        "final_exam": [
-            79, 74, 88, 63, 80,
-            92, 58, 71, 51, 96,
-            82, 68, 84, 44, 95,
-            77, 70, 86, 53, 91,
-            75, 60, 90, 78, 83,
-            93, 65, 74, 99, 55,
-        ],
-        "letter": [
-            "B", "C", "A", "D", "B",
-            "B", "F", "C", "F", "A",
-            "B", "D", "B", "F", "A",
-            "C", "C", "B", "F", "A",
-            "C", "D", "B", "C", "B",
-            "A", "D", "C", "A", "F",
-        ],
-    }
-    _setup_df = pd.DataFrame(_data)
-    _setup_df.to_csv(_csv_path, index=False)
+def _(mo):
+    mo.md(r"""
+    # Section 7: NumPy Arrays
+    """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
+    mo.md(r"""
+    ## What is NumPy?
+
+    In Section 5, you used a Python list to store a collection of scores and looped over it to compute statistics. That works, but it requires a loop for every calculation. NumPy lets you skip the loop entirely and operate on the whole collection at once.
+
+    **NumPy** is a Python library built for numerical computation. Its core data structure is the **array**: an ordered collection of numbers that supports math operations directly, without looping.
+
+    Import NumPy at the top of your notebook:
+
+    ```python
+    import numpy as np
+    ```
+
+    The `as np` alias is standard practice you will see in any NumPy code.
+
+    ## Creating an Array
+
+    Create a NumPy array from a Python list using `np.array()`:
+
+    ```python
+    scores = np.array([88, 72, 95, 61, 83, 77, 90, 68, 54, 79])
+    ```
+
+    The result looks similar to a list, but it supports math that lists do not.
+
+    ## Aggregation Functions
+
+    NumPy has built-in functions for common statistics:
+
+    ```python
+    np.mean(scores)   # average
+    np.max(scores)    # highest value
+    np.min(scores)    # lowest value
+    np.sum(scores)    # total
+    ```
+
+    These run over the entire array in one call, no loop needed.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Exercise 21
+
+    Create a NumPy array called `ex21_scores` from `ex21_data`. Compute and store the mean in `ex21_mean`, the max in `ex21_max`, and the min in `ex21_min`.
+    """)
+    return
+
+
+@app.cell
+def _ex21_student(np):
+    ex21_data = [88, 72, 95, 61, 83, 77, 90, 68, 54, 79]
+    ex21_scores = np.array(ex21_data)
+    ex21_mean = np.mean(ex21_scores)
+    ex21_max = np.max(ex21_scores)
+    ex21_min = np.min(ex21_scores)
+    return (ex21_data, ex21_scores, ex21_mean, ex21_max, ex21_min,)
+
+
+@app.cell
+def _ex21_scaffold(ex21_mean, ex21_max, ex21_min):
+    print(f"Mean: {ex21_mean:.1f}")
+    print(f"Max:  {ex21_max}")
+    print(f"Min:  {ex21_min}")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Element-wise Operations
+
+    With a Python list, adding 5 points to every score requires a loop. With a NumPy array, you write the arithmetic directly:
+
+    ```python
+    curved = scores + 5        # adds 5 to every element
+    scaled = scores * 1.1      # multiplies every element by 1.1
+    ```
+
+    The operation applies to every element at once. You can also combine two arrays of the same length; NumPy pairs them element by element:
+
+    ```python
+    homework = np.array([80, 90, 70])
+    final    = np.array([75, 85, 65])
+
+    average = (homework + final) / 2   # [77.5, 87.5, 67.5]
+    ```
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Exercise 22
+
+    Apply a 5-point curve to `ex21_scores` by adding 5 to every element. Store the result in `ex22_curved`. Then compute the new mean and store it in `ex22_curved_mean`.
+    """)
+    return
+
+
+@app.cell
+def _ex22_student(np, ex21_scores):
+    ex22_curved = ex21_scores + 5
+    ex22_curved_mean = np.mean(ex22_curved)
+    return (ex22_curved, ex22_curved_mean,)
+
+
+@app.cell
+def _ex22_scaffold(ex21_mean, ex22_curved_mean, ex22_curved):
+    print(f"Original mean: {ex21_mean:.1f}")
+    print(f"Curved mean:   {ex22_curved_mean:.1f}")
+    print(f"Curved scores: {ex22_curved}")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Boolean Indexing
+
+    You can filter an array by writing a condition inside square brackets. NumPy checks the condition for every element and returns only the ones where it is `True`:
+
+    ```python
+    passing = scores[scores >= 60]   # only scores of 60 or above
+    high = scores[scores >= 90]      # only scores of 90 or above
+    ```
+
+    The condition `scores >= 60` returns an array of `True`/`False` values, one per element. The outer `scores[...]` uses that to keep only the matching elements.
+
+    To count how many elements matched, use `len()`:
+
+    ```python
+    len(scores[scores >= 60])   # number of passing scores
+    ```
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Exercise 23
+
+    Using `ex22_curved`, create `ex23_passing`: an array containing only the scores that are 60 or above. Then store the count of passing students in `ex23_passing_count`.
+    """)
+    return
+
+
+@app.cell
+def _ex23_student(ex22_curved):
+    ex23_passing = ex22_curved[ex22_curved >= 60]
+    ex23_passing_count = len(ex23_passing)
+    return (ex23_passing, ex23_passing_count,)
+
+
+@app.cell
+def _ex23_scaffold(ex23_passing, ex23_passing_count, ex22_curved):
+    print(f"Passing scores: {ex23_passing}")
+    print(f"Passing count:  {ex23_passing_count} out of {len(ex22_curved)}")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Combining Arrays
+
+    When you have multiple arrays of the same length, you can compute a weighted combination the same way you would write the formula:
+
+    ```python
+    homework = np.array([80, 90, 70])
+    midterm = np.array([75, 85, 65])
+    final = np.array([82, 88, 60])
+
+    weighted = homework * 0.3 + midterm * 0.3 + final * 0.4
+    ```
+
+    Each multiplication and addition runs element-by-element across all three arrays at once.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Exercise 24
+
+    Three score arrays are provided below. Compute `ex24_weighted_average` using the weights: homework 30%, midterm 30%, final exam 40%.
+    """)
+    return
+
+
+@app.cell
+def _ex24_student(np):
+    ex24_homework = np.array([85, 60, 92, 74, 55])
+    ex24_midterm = np.array([78, 65, 88, 70, 48])
+    ex24_final_exam = np.array([80, 70, 91, 68, 52])
+    ex24_weighted_average = ex24_homework * 0.3 + ex24_midterm * 0.3 + ex24_final_exam * 0.4
+    return (ex24_homework, ex24_midterm, ex24_final_exam, ex24_weighted_average,)
+
+
+@app.cell
+def _ex24_scaffold(ex24_weighted_average, np):
+    print(f"Weighted averages: {ex24_weighted_average}")
+    print(f"Class mean: {np.mean(ex24_weighted_average):.1f}")
+    return
+
+
+# ── Section 8: Pandas & DataFrames ───────────────────────────────────────────
+
+@app.cell(hide_code=True)
+def _(mo):
     mo.md("""
-    # Section 7: Pandas & DataFrames
+    # Section 8: Pandas & DataFrames
     """)
     return
 
@@ -1287,7 +1543,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 21
+    ## Exercise 25
 
     Load `gradebook.csv` into a DataFrame called `gradebook_df`. Print the first 5 rows,
     the shape, and the column names.
@@ -1344,27 +1600,27 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 22
+    ## Exercise 26
 
-    Select the `homework` column from `gradebook_df`. Store the mean in `ex22_homework_mean`,
-    the max in `ex22_homework_max`, and the min in `ex22_homework_min`.
+    Select the `homework` column from `gradebook_df`. Store the mean in `ex26_homework_mean`,
+    the max in `ex26_homework_max`, and the min in `ex26_homework_min`.
     """)
     return
 
 
 @app.cell
 def _(gradebook_df):
-    ex22_homework_mean = gradebook_df["homework"].mean()
-    ex22_homework_max = gradebook_df["homework"].max()
-    ex22_homework_min = gradebook_df["homework"].min()
-    return (ex22_homework_mean, ex22_homework_max, ex22_homework_min)
+    ex26_homework_mean = gradebook_df["homework"].mean()
+    ex26_homework_max = gradebook_df["homework"].max()
+    ex26_homework_min = gradebook_df["homework"].min()
+    return (ex26_homework_mean, ex26_homework_max, ex26_homework_min)
 
 
 @app.cell
-def _(ex22_homework_max, ex22_homework_mean, ex22_homework_min):
-    print(f"Homework mean: {ex22_homework_mean:.1f}")
-    print(f"Homework max:  {ex22_homework_max:.1f}")
-    print(f"Homework min:  {ex22_homework_min:.1f}")
+def _(ex26_homework_max, ex26_homework_mean, ex26_homework_min):
+    print(f"Homework mean: {ex26_homework_mean:.1f}")
+    print(f"Homework max:  {ex26_homework_max:.1f}")
+    print(f"Homework min:  {ex26_homework_min:.1f}")
     return
 
 
@@ -1410,10 +1666,10 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 23
+    ## Exercise 27
 
     Filter `gradebook_df` to only students who scored below 60 on the final exam. Store the
-    **full filtered DataFrame** in `ex23_at_risk`. Storing the full DataFrame lets you access
+    **full filtered DataFrame** in `ex27_at_risk`. Storing the full DataFrame lets you access
     any column later if needed.
     """)
     return
@@ -1421,13 +1677,13 @@ def _(mo):
 
 @app.cell
 def _(gradebook_df):
-    ex23_at_risk = gradebook_df[gradebook_df["final_exam"] < 60]
-    return (ex23_at_risk,)
+    ex27_at_risk = gradebook_df[gradebook_df["final_exam"] < 60]
+    return (ex27_at_risk,)
 
 
 @app.cell
-def _(ex23_at_risk):
-    print(ex23_at_risk[["name", "final_exam"]])
+def _(ex27_at_risk):
+    print(ex27_at_risk[["name", "final_exam"]])
     return
 
 
@@ -1466,7 +1722,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 24
+    ## Exercise 28
 
     Add a column called `weighted_average` to `gradebook_df`, calculated as:
     homework 30%, midterm 30%, final exam 40%.
@@ -1511,9 +1767,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 25
+    ## Exercise 29
 
-    Create `ex25_sorted`: a DataFrame showing just `name`, `weighted_average`, and `letter`,
+    Create `ex29_sorted`: a DataFrame showing just `name`, `weighted_average`, and `letter`,
     sorted from highest to lowest weighted average.
     """)
     return
@@ -1521,25 +1777,25 @@ def _(mo):
 
 @app.cell
 def _(gradebook_df):
-    ex25_sorted = gradebook_df[["name", "weighted_average", "letter"]].sort_values(
+    ex29_sorted = gradebook_df[["name", "weighted_average", "letter"]].sort_values(
         by="weighted_average",
         ascending=False
     )
-    return (ex25_sorted,)
+    return (ex29_sorted,)
 
 
 @app.cell
-def _(ex25_sorted):
-    print(ex25_sorted)
+def _(ex29_sorted):
+    print(ex29_sorted)
     return
 
 
-# ── Section 8: Matplotlib ─────────────────────────────────────────────────────
+# ── Section 9: Matplotlib ─────────────────────────────────────────────────────
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    # Section 8: Matplotlib
+    # Section 9: Matplotlib
 
     **Matplotlib** is a Python library for creating charts and graphs. Import it like this:
 
@@ -1623,9 +1879,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 26
+    ## Exercise 30
 
-    **Instructions:** Create a bar chart showing the class average score for each assessment. Compute the mean of each column (`homework`, `midterm`, `final_exam`) from `gradebook_df`. Store them in `ex26_homework_mean`, `ex26_midterm_mean`, and `ex26_final_mean`. Store the label list in `ex26_assessments` and the mean list in `ex26_means`. Add a title and labels for both axes.
+    **Instructions:** Create a bar chart showing the class average score for each assessment. Compute the mean of each column (`homework`, `midterm`, `final_exam`) from `gradebook_df`. Store them in `ex30_homework_mean`, `ex30_midterm_mean`, and `ex30_final_mean`. Store the label list in `ex30_assessments` and the mean list in `ex30_means`. Add a title and labels for both axes.
 
     Example output: a bar chart with three bars labeled "Homework", "Midterm", and "Final Exam".
     """)
@@ -1634,14 +1890,14 @@ def _(mo):
 
 @app.cell
 def _(gradebook_df, plt):
-    ex26_homework_mean = gradebook_df["homework"].mean()
-    ex26_midterm_mean = gradebook_df["midterm"].mean()
-    ex26_final_mean = gradebook_df["final_exam"].mean()
+    ex30_homework_mean = gradebook_df["homework"].mean()
+    ex30_midterm_mean = gradebook_df["midterm"].mean()
+    ex30_final_mean = gradebook_df["final_exam"].mean()
 
-    ex26_assessments = ["Homework", "Midterm", "Final Exam"]
-    ex26_means = [ex26_homework_mean, ex26_midterm_mean, ex26_final_mean]
+    ex30_assessments = ["Homework", "Midterm", "Final Exam"]
+    ex30_means = [ex30_homework_mean, ex30_midterm_mean, ex30_final_mean]
 
-    plt.bar(ex26_assessments, ex26_means)
+    plt.bar(ex30_assessments, ex30_means)
     plt.title("Class Average by Assessment")
     plt.xlabel("Assessment")
     plt.ylabel("Average Score")
@@ -1669,7 +1925,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 27
+    ## Exercise 31
 
     **Instructions:** Create a scatter plot of `homework` scores (x-axis) vs `final_exam` scores (y-axis) from `gradebook_df`. Add a title and axis labels.
 
@@ -1708,7 +1964,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 28
+    ## Exercise 32
 
     **Instructions:** Create a histogram of the `weighted_average` column from `gradebook_df`. Add a title and axis labels.
 
@@ -1752,9 +2008,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 29
+    ## Exercise 33
 
-    **Instructions:** Create a bar chart showing how many students received each letter grade. Use `.value_counts().sort_index()` on the `letter` column. Store the result in `ex29_grade_counts`. Sort the grades alphabetically (A through F). Pass `ex29_grade_counts.index` as the labels and `ex29_grade_counts.values` as the heights to `plt.bar()`. Add a title and axis labels.
+    **Instructions:** Create a bar chart showing how many students received each letter grade. Use `.value_counts().sort_index()` on the `letter` column. Store the result in `ex33_grade_counts`. Sort the grades alphabetically (A through F). Pass `ex33_grade_counts.index` as the labels and `ex33_grade_counts.values` as the heights to `plt.bar()`. Add a title and axis labels.
 
     Example output: a bar chart with up to 5 bars labeled A, B, C, D, F.
     """)
@@ -1763,9 +2019,9 @@ def _(mo):
 
 @app.cell
 def _(gradebook_df, plt):
-    ex29_grade_counts = gradebook_df["letter"].value_counts().sort_index()
+    ex33_grade_counts = gradebook_df["letter"].value_counts().sort_index()
 
-    plt.bar(ex29_grade_counts.index, ex29_grade_counts.values)
+    plt.bar(ex33_grade_counts.index, ex33_grade_counts.values)
     plt.title("Grade Distribution")
     plt.xlabel("Letter Grade")
     plt.ylabel("Number of Students")
@@ -1795,8 +2051,8 @@ def _(mo):
     When you need to plot data that does not have natural labels - like 30 students sorted by rank - use `range(len(...))` to generate position numbers for the x-axis:
 
     ```python
-    ex30_sorted = gradebook_df["weighted_average"].sort_values().values
-    plt.bar(range(len(ex30_sorted)), ex30_sorted)
+    ex34_sorted = gradebook_df["weighted_average"].sort_values().values
+    plt.bar(range(len(ex34_sorted)), ex34_sorted)
     plt.xlabel("Rank")
     plt.show()
     ```
@@ -1809,9 +2065,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 30
+    ## Exercise 34
 
-    **Instructions:** Create a bar chart of all students' weighted averages, sorted from lowest to highest. Use `.sort_values().values` on the `weighted_average` column to get the sorted array. Store the result in `ex30_sorted`. Add a horizontal reference line at 60 (passing) and another at 90 (A grade). Add axis labels. Set the figure size to `(12, 5)`.
+    **Instructions:** Create a bar chart of all students' weighted averages, sorted from lowest to highest. Use `.sort_values().values` on the `weighted_average` column to get the sorted array. Store the result in `ex34_sorted`. Add a horizontal reference line at 60 (passing) and another at 90 (A grade). Add axis labels. Set the figure size to `(12, 5)`.
 
     Example output: a bar chart with 30 bars rising from left to right, with red and green reference lines at 60 and 90.
     """)
@@ -1820,10 +2076,10 @@ def _(mo):
 
 @app.cell
 def _(gradebook_df, plt):
-    ex30_sorted = gradebook_df["weighted_average"].sort_values().values
+    ex34_sorted = gradebook_df["weighted_average"].sort_values().values
 
     plt.figure(figsize=(12, 5))
-    plt.bar(range(len(ex30_sorted)), ex30_sorted)
+    plt.bar(range(len(ex34_sorted)), ex34_sorted)
     plt.axhline(y=60, color="red", linestyle="--")
     plt.axhline(y=90, color="green", linestyle="--")
     plt.title("Student Weighted Averages - Lowest to Highest")
@@ -1833,12 +2089,12 @@ def _(gradebook_df, plt):
     return
 
 
-# ── Section 9: Scikit-learn ───────────────────────────────────────────────────
+# ── Section 10: Scikit-learn ───────────────────────────────────────────────────
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    # Section 9: Scikit-learn
+    # Section 10: Scikit-learn
 
     ## What is Machine Learning?
 
@@ -1891,25 +2147,25 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 31
+    ## Exercise 35
 
-    **Instructions:** Using `ex31_df`, store the `study_hours` and `attendance` columns (use double brackets to keep it as a DataFrame) in `ex31_features`, and the `final_exam` column in `ex31_labels`.
+    **Instructions:** Using `ex35_df`, store the `study_hours` and `attendance` columns (use double brackets to keep it as a DataFrame) in `ex35_features`, and the `final_exam` column in `ex35_labels`.
     """)
     return
 
 
 @app.cell
 def _(pd):
-    ex31_df = pd.read_csv("students.csv")
-    ex31_features = ex31_df[["study_hours", "attendance"]]
-    ex31_labels = ex31_df["final_exam"]
-    return ex31_df, ex31_features, ex31_labels
+    ex35_df = pd.read_csv("students.csv")
+    ex35_features = ex35_df[["study_hours", "attendance"]]
+    ex35_labels = ex35_df["final_exam"]
+    return ex35_df, ex35_features, ex35_labels
 
 
 @app.cell
-def _(ex31_features, ex31_labels):
-    print(f"Features shape: {ex31_features.shape}")
-    print(f"Labels length: {len(ex31_labels)}")
+def _(ex35_features, ex35_labels):
+    print(f"Features shape: {ex35_features.shape}")
+    print(f"Labels length: {len(ex35_labels)}")
     return
 
 
@@ -1942,25 +2198,25 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 32
+    ## Exercise 36
 
-    **Instructions:** Split `ex31_features` and `ex31_labels` into training and test sets using `test_size=0.2` and `random_state=42`. Store the results in `ex32_features_train`, `ex32_features_test`, `ex32_labels_train`, and `ex32_labels_test`.
+    **Instructions:** Split `ex35_features` and `ex35_labels` into training and test sets using `test_size=0.2` and `random_state=42`. Store the results in `ex36_features_train`, `ex36_features_test`, `ex36_labels_train`, and `ex36_labels_test`.
     """)
     return
 
 
 @app.cell
-def _(ex31_features, ex31_labels, train_test_split):
-    ex32_features_train, ex32_features_test, ex32_labels_train, ex32_labels_test = train_test_split(
-        ex31_features, ex31_labels, test_size=0.2, random_state=42
+def _(ex35_features, ex35_labels, train_test_split):
+    ex36_features_train, ex36_features_test, ex36_labels_train, ex36_labels_test = train_test_split(
+        ex35_features, ex35_labels, test_size=0.2, random_state=42
     )
-    return ex32_features_test, ex32_features_train, ex32_labels_test, ex32_labels_train
+    return ex36_features_test, ex36_features_train, ex36_labels_test, ex36_labels_train
 
 
 @app.cell
-def _(ex32_features_test, ex32_features_train):
-    print(f"Training rows: {len(ex32_features_train)}")
-    print(f"Test rows: {len(ex32_features_test)}")
+def _(ex36_features_test, ex36_features_train):
+    print(f"Training rows: {len(ex36_features_train)}")
+    print(f"Test rows: {len(ex36_features_test)}")
     return
 
 
@@ -2004,28 +2260,28 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 33
+    ## Exercise 37
 
-    **Instructions:** Create a `LinearRegression` model called `ex33_model`. Train it by calling `.fit()` with `ex32_features_train` and `ex32_labels_train`. Generate predictions on the test set by calling `.predict()` with `ex32_features_test` and store them in `ex33_predictions`. Evaluate the model by calling `.score()` with `ex32_features_test` and `ex32_labels_test` and store the R^2 score in `ex33_score`.
+    **Instructions:** Create a `LinearRegression` model called `ex37_model`. Train it by calling `.fit()` with `ex36_features_train` and `ex36_labels_train`. Generate predictions on the test set by calling `.predict()` with `ex36_features_test` and store them in `ex37_predictions`. Evaluate the model by calling `.score()` with `ex36_features_test` and `ex36_labels_test` and store the R^2 score in `ex37_score`.
     """)
     return
 
 
 @app.cell
-def _(LinearRegression, ex32_features_test, ex32_features_train, ex32_labels_test, ex32_labels_train):
-    ex33_model = LinearRegression()
-    ex33_model.fit(ex32_features_train, ex32_labels_train)
-    ex33_predictions = ex33_model.predict(ex32_features_test)
-    ex33_score = ex33_model.score(ex32_features_test, ex32_labels_test)
-    return ex33_model, ex33_predictions, ex33_score
+def _(LinearRegression, ex36_features_test, ex36_features_train, ex36_labels_test, ex36_labels_train):
+    ex37_model = LinearRegression()
+    ex37_model.fit(ex36_features_train, ex36_labels_train)
+    ex37_predictions = ex37_model.predict(ex36_features_test)
+    ex37_score = ex37_model.score(ex36_features_test, ex36_labels_test)
+    return ex37_model, ex37_predictions, ex37_score
 
 
 @app.cell
-def _(ex32_labels_test, ex33_predictions, ex33_score):
+def _(ex36_labels_test, ex37_predictions, ex37_score):
     print("Predicted  Actual")
     for _i in range(5):
-        print(f"{ex33_predictions[_i]:.1f}       {ex32_labels_test.iloc[_i]}")
-    print(f"R^2 score: {ex33_score:.3f}")
+        print(f"{ex37_predictions[_i]:.1f}       {ex36_labels_test.iloc[_i]}")
+    print(f"R^2 score: {ex37_score:.3f}")
     return
 
 
@@ -2050,16 +2306,16 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Exercise 35
+    ## Exercise 39
 
-    **Instructions:** Create a scatter plot comparing the model's predictions to the actual test scores. Use `ex32_labels_test` as the x values and `ex33_predictions` as the y values. Add a dashed red diagonal line from (40, 40) to (100, 100) representing perfect predictions - points close to this line indicate accurate predictions. Add a title and axis labels.
+    **Instructions:** Create a scatter plot comparing the model's predictions to the actual test scores. Use `ex36_labels_test` as the x values and `ex37_predictions` as the y values. Add a dashed red diagonal line from (40, 40) to (100, 100) representing perfect predictions - points close to this line indicate accurate predictions. Add a title and axis labels.
     """)
     return
 
 
 @app.cell
-def _(ex32_labels_test, ex33_predictions, plt):
-    plt.scatter(ex32_labels_test, ex33_predictions)
+def _(ex36_labels_test, ex37_predictions, plt):
+    plt.scatter(ex36_labels_test, ex37_predictions)
     plt.plot([40, 100], [40, 100], color="red", linestyle="--")
     plt.title("Actual vs Predicted Final Exam Scores")
     plt.xlabel("Actual Score")
